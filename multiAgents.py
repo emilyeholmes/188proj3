@@ -152,7 +152,52 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        def value(agentIndex, state, depth):
+            if depth >= self.depth:
+                return self.evaluationFunction(state)
+            if agentIndex >= state.getNumAgents():
+                agentIndex = 0
+            if state.isWin() or state.isLose():
+                return self.evaluationFunction(state)
+            elif agentIndex == 0:
+                return max_val(agentIndex, state, depth)
+            else:
+                return min_val(agentIndex, state, depth)
+
+        def max_val(agentIndex, state, depth):
+            v = float("-inf")
+            for action in state.getLegalActions(agentIndex):
+                succ = state.generateSuccessor(agentIndex, action)
+                v = max(v, value(agentIndex + 1, succ, depth))
+            return v
+
+        def min_val(agentIndex, state, depth):
+            v = float("inf")
+            if agentIndex == state.getNumAgents() - 1:
+                depth += 1
+            if depth >= self.depth:
+                    return float("inf") #self.evaluationFunction(state)
+            for action in state.getLegalActions(agentIndex):
+                succ = state.generateSuccessor(agentIndex, action)
+                v = min(v, value(agentIndex + 1, succ, depth))
+            return v
+        
+        bestMove = None
+        bestMoveVal = float("-inf")
+
+        if gameState.isWin() or gameState.isLose():
+                return bestMove
+
+        for action in gameState.getLegalActions(0):
+            succ = gameState.generateSuccessor(0, action)
+            val = value(agentIndex = 0, state = succ, depth = 0)
+            if val > bestMoveVal:
+                bestMove = action
+                bestMoveVal = val
+        return bestMove
+
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
