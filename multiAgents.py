@@ -259,7 +259,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             a = max(val, a)
         return bestMove
 
-        # util.raiseNotDefined()
 
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
@@ -274,8 +273,60 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         All ghosts should be modeled as choosing uniformly at random from their
         legal moves.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        def mean(lst):
+            return sum(lst) / len(lst)
+        
+        def value(agentIndex, state, depth):
+            if depth >= self.depth:
+                return self.evaluationFunction(state)
+            if agentIndex >= state.getNumAgents():
+                agentIndex = 0
+            if state.isWin() or state.isLose():
+                return self.evaluationFunction(state)
+            elif agentIndex == 0:
+                return max_val(agentIndex, state, depth)
+            else:
+                return min_val(agentIndex, state, depth)
+
+        def max_val(agentIndex, state, depth):
+            v = float("-inf")
+            # state_vals = []
+            for action in state.getLegalActions(agentIndex):
+                succ = state.generateSuccessor(agentIndex, action)
+                v = max(v, value(agentIndex + 1, succ, depth))
+                # state_val = value(agentIndex + 1, succ, depth)
+                # state_vals.append(state_val)
+            # v = mean(state_vals)
+            return v
+
+        def min_val(agentIndex, state, depth):
+            # v = float("inf")
+            state_vals = []
+            if agentIndex == state.getNumAgents() - 1:
+                depth += 1
+            
+            for action in state.getLegalActions(agentIndex):
+                succ = state.generateSuccessor(agentIndex, action)
+                state_val = value(agentIndex + 1, succ, depth)
+                state_vals.append(state_val)
+            v = mean(state_vals)
+            return v
+        
+        bestMove = None
+        bestMoveVal = float("-inf")
+
+        if gameState.isWin() or gameState.isLose():
+                return bestMove
+
+        for action in gameState.getLegalActions(0):
+            succ = gameState.generateSuccessor(0, action)
+            val = value(agentIndex = 1, state = succ, depth = 0)
+            if val > bestMoveVal:
+                bestMove = action
+                bestMoveVal = val
+        return bestMove
+
 
 def betterEvaluationFunction(currentGameState: GameState):
     """
